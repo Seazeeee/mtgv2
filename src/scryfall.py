@@ -1,10 +1,9 @@
 import requests
-import os
 from dotenv import load_dotenv  # noqa: F401
 from datetime import datetime
 import pandas as pd
-from internal_classes.api_base import APIClient
-from internal_classes.db_client import PostgresClient
+from src.internal_classes.api_base import APIClient
+from src.internal_classes.db_client import PostgresClient
 
 
 class ScryfallClient(APIClient):
@@ -44,13 +43,3 @@ class ScryfallClient(APIClient):
         db = PostgresClient(uri=self.db_uri, df=df)
 
         return db.push(df)
-
-
-if __name__ == "__main__":
-    dotenv_loaded = load_dotenv()
-    DB_URI = os.getenv("DB_URI")
-
-    client = ScryfallClient(uri="https://api.scryfall.com/bulk-data", db_uri=DB_URI)
-    df = client.fetch()
-
-    print(client.push(df))

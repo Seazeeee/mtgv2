@@ -6,7 +6,10 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "black>=25.9.0",
+    "dagster>=1.11.12",
     "dagster-dbt>=0.27.12",
+    "dagster-dg-cli>=1.11.12",
+    "dagster-webserver>=1.11.12",
     "pandas>=2.3.2",
     "psycopg2>=2.9.10",
     "python-dotenv>=1.1.1",
@@ -14,3 +17,7 @@ dependencies = [
     "ruff>=0.13.2",
     "sqlalchemy>=2.0.43",
 ]
+
+[tool.dagster]
+module_name = "src.defs.repository"
+code_location_name = "mtgv2.src"
