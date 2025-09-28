@@ -1,4 +1,0 @@
-load_from:
-  - grpc_server:
-      host: "localhost"
-      port: ${GRPC_PORT}

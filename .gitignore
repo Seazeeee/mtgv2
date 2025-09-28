@@ -213,3 +213,7 @@ database/
 
 # Dagster .tmp if exists
 .tmp*
+# Below is added because local .env doesn't work in YAML. 
+# Template has been added to github. No reason to keep updating.
+workspace.yml
+
