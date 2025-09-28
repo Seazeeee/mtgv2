@@ -24,11 +24,11 @@ you can work around this by manually starting the gRPC server and pointing Dagst
    load_from:
      - grpc_server:
          host: "localhost"
-         port: 4000
+         port: <PORT>
    ```
 
 3. Run the Dagster web server as usual:
 
    ```bash
-   dg dev --use-ssl
+   dg dev --use-ssl -w workspace.yml
    ```
