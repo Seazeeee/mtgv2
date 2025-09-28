@@ -10,6 +10,8 @@ from mtgv2.internal_classes.db_client import DatabaseClient
 @asset(
     description="""Gets all the ordinary cards from Scryfall bulk api and appends
         them to a table inside of Postgres with the date""",
+    group_name="scryfall",
+    tags={"ui_section": "RAW_DATA"},
 )
 def get_scryfall_cards() -> pd.DataFrame:
     load_dotenv()
@@ -26,6 +28,7 @@ def get_scryfall_cards() -> pd.DataFrame:
 @asset(
     description="Pushes the given df to Postgres",
     deps=["get_scryfall_cards"],
+    group_name="push_to_postgres",
 )
 def push_to_postgres(get_scryfall_cards: pd.DataFrame) -> str:
     # Now you have access to the df from get_scryfall_cards
@@ -39,6 +42,7 @@ def push_to_postgres(get_scryfall_cards: pd.DataFrame) -> str:
     description="""Gets the table of scryfall cards that has todays date
         appended to the end of the name. This is just our base format.""",
     deps=["push_to_postgres"],
+    group_name="scryfall",
 )
 def pull_scryfall_table() -> pd.DataFrame:
     load_dotenv()
