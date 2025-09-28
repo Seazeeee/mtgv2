@@ -687,6 +687,20 @@ wheels = [
 ]
 
 [[package]]
+name = "duckdb"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/93/adc0d183642fc9a602ca9b97cb16754c84b8c1d92e5b99aec412e0c419a8/duckdb-1.4.0.tar.gz", hash = "sha256:bd5edee8bd5a73b5822f2b390668597b5fcdc2d3292c244d8d933bb87ad6ac4c", size = 18453175, upload-time = "2025-09-16T10:22:41.509Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2f/64/ee22b2b8572746e1523143b9f28d606575782e0204de5020656a1d15dd14/duckdb-1.4.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:1d94d010a09b1a62d9021a2a71cf266188750f3c9b1912ccd6afe104a6ce8010", size = 31307662, upload-time = "2025-09-16T10:22:14.9Z" },
+    { url = "https://files.pythonhosted.org/packages/76/2e/4241cd00046ca6b781bd1d9002e8223af061e85d1cc21830aa63e7a7db7c/duckdb-1.4.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:c61756fa8b3374627e5fa964b8e0d5b58e364dce59b87dba7fb7bc6ede196b26", size = 17295617, upload-time = "2025-09-16T10:22:17.239Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/98/5ab136bc7b12ac18580350a220db7c00606be9eac2d89de259cce733f64c/duckdb-1.4.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:e70d7d9881ea2c0836695de70ea68c970e18a2856ba3d6502e276c85bd414ae7", size = 14826727, upload-time = "2025-09-16T10:22:19.415Z" },
+    { url = "https://files.pythonhosted.org/packages/23/32/57866cf8881288b3dfb9212720221fb890daaa534dbdc6fe3fff3979ecd1/duckdb-1.4.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:2de258a93435c977a0ec3a74ec8f60c2f215ddc73d427ee49adc4119558facd3", size = 18421289, upload-time = "2025-09-16T10:22:21.564Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/83/7438fb43be451a7d4a04650aaaf662b2ff2d95895bbffe3e0e28cbe030c9/duckdb-1.4.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a6d3659641d517dd9ed1ab66f110cdbdaa6900106f116effaf2dbedd83c38de3", size = 20426547, upload-time = "2025-09-16T10:22:23.759Z" },
+    { url = "https://files.pythonhosted.org/packages/21/b2/98fb89ae81611855f35984e96f648d871f3967bb3f524b51d1372d052f0c/duckdb-1.4.0-cp313-cp313-win_amd64.whl", hash = "sha256:07fcc612ea5f0fe6032b92bcc93693034eb00e7a23eb9146576911d5326af4f7", size = 12290467, upload-time = "2025-09-16T10:22:25.923Z" },
+]
+
+[[package]]
 name = "filelock"
 version = "3.19.1"
 source = { registry = "https://pypi.org/simple" }
@@ -936,6 +950,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/20/b0/36bd937216ec521246249be3bf9855081de4c5e06a0c9b4219dbeda50373/importlib_metadata-8.7.0-py3-none-any.whl", hash = "sha256:e5dd1551894c77868a30651cef00984d50e1002d06942a7101d34870c5f02afd", size = 27656, upload-time = "2025-04-27T15:29:00.214Z" },
+]
+
+[[package]]
+name = "iniconfig"
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f2/97/ebf4da567aa6827c909642694d71c9fcf53e5b504f2d96afea02718862f3/iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7", size = 4793, upload-time = "2025-03-19T20:09:59.721Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2c/e1/e6716421ea10d38022b952c159d5161ca1193197fb744506875fbb87ea7b/iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760", size = 6050, upload-time = "2025-03-19T20:10:01.071Z" },
 ]
 
 [[package]]
@@ -1204,8 +1227,10 @@ dependencies = [
     { name = "dagster-dbt" },
     { name = "dagster-dg-cli" },
     { name = "dagster-webserver" },
+    { name = "duckdb" },
     { name = "pandas" },
     { name = "psycopg2" },
+    { name = "pytest" },
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "ruff" },
@@ -1219,8 +1244,10 @@ requires-dist = [
     { name = "dagster-dbt", specifier = ">=0.27.10" },
     { name = "dagster-dg-cli", specifier = ">=1.11.10" },
     { name = "dagster-webserver", specifier = "==1.11.10" },
+    { name = "duckdb", specifier = ">=1.4.0" },
     { name = "pandas", specifier = ">=2.3.2" },
     { name = "psycopg2", specifier = ">=2.9.10" },
+    { name = "pytest", specifier = ">=8.4.2" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "ruff", specifier = ">=0.13.2" },
@@ -1449,6 +1476,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pluggy"
+version = "1.6.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412, upload-time = "2025-05-15T12:30:07.975Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
+]
+
+[[package]]
 name = "prompt-toolkit"
 version = "3.0.52"
 source = { registry = "https://pypi.org/simple" }
@@ -1631,6 +1667,22 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0f/49/4cea918a08f02817aabae639e3d0ac046fef9f9180518a3ad394e22da148/pyreadline3-3.5.4.tar.gz", hash = "sha256:8d57d53039a1c75adba8e50dd3d992b28143480816187ea5efbd5c78e6c885b7", size = 99839, upload-time = "2024-09-19T02:40:10.062Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/dc/491b7661614ab97483abf2056be1deee4dc2490ecbf7bff9ab5cdbac86e1/pyreadline3-3.5.4-py3-none-any.whl", hash = "sha256:eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6", size = 83178, upload-time = "2024-09-19T02:40:08.598Z" },
+]
+
+[[package]]
+name = "pytest"
+version = "8.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "iniconfig" },
+    { name = "packaging" },
+    { name = "pluggy" },
+    { name = "pygments" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a3/5c/00a0e072241553e1a7496d638deababa67c5058571567b92a7eaa258397c/pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01", size = 1519618, upload-time = "2025-09-04T14:34:22.711Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl", hash = "sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79", size = 365750, upload-time = "2025-09-04T14:34:20.226Z" },
 ]
 
 [[package]]

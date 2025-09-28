@@ -50,4 +50,4 @@ class ScryfallClient(APIClient):
 
         db = DatabaseClient(uri=self.db_uri)
 
-        return db.pull(table_name)
+        return db.get(table_name)
