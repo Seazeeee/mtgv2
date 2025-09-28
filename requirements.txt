@@ -1,0 +1,10 @@
+black
+dagster
+dagster-dbt
+dagster-dg-cli
+pandas
+psycogp2
+python-dotenv
+requests
+ruff
+sqlalchemy
