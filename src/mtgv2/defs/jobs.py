@@ -1,5 +1,4 @@
 import dagster as dg
-from .assets import *
 
 # Job for all assets
 all_assets_job = dg.define_asset_job(name="all_assets_job")
