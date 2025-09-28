@@ -211,3 +211,5 @@ __marimo__/
 # Database
 database/
 
+# Dagster .tmp if exists
+.tmp*
