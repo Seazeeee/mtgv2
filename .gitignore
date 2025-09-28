@@ -25,6 +25,8 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.python-version
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -205,3 +207,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Database
+database/
+
+# Dagster .tmp if exists
+.tmp*
+# Below is added because local .env doesn't work in YAML. 
+# Template has been added to github. No reason to keep updating.
+workspace.yml
+
