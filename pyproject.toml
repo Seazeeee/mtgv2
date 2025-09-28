@@ -32,3 +32,8 @@ root_module = "mtgv2"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+
+[project.optional-dependencies]
+postgres = ["psycopg2-binary"]
+test = ["pytest", "duckdb"]
+dev = ["psycopg2-binary", "pytest", "duckdb"]
