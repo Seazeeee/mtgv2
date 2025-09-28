@@ -2,8 +2,8 @@ import requests
 from dotenv import load_dotenv  # noqa: F401
 from datetime import datetime
 import pandas as pd
-from src.internal_classes.api_base import APIClient
-from src.internal_classes.db_client import PostgresClient
+from .internal_classes.api_base import APIClient
+from .internal_classes.db_client import DatabaseClient
 
 
 class ScryfallClient(APIClient):
@@ -37,9 +37,17 @@ class ScryfallClient(APIClient):
         return df
 
     def push(self, df: pd.DataFrame) -> str:
-        if not self.uri:
+        if not self.db_uri:
             raise ValueError("No database URI provided for push()")
 
-        db = PostgresClient(uri=self.db_uri, df=df)
+        db = DatabaseClient(uri=self.db_uri)
 
         return db.push(df)
+
+    def pull(self, table_name: str) -> pd.DataFrame:
+        if not self.db_uri:
+            raise ValueError("No database URI provided for pull()")
+
+        db = DatabaseClient(uri=self.db_uri)
+
+        return db.pull(table_name)
