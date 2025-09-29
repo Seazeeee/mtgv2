@@ -15,7 +15,7 @@ you can work around this by manually starting the gRPC server and pointing Dagst
 1. Start the gRPC server manually:
 
    ```bash
-   dagster api grpc -p <PORT> -h 0.0.0.0 (localhost) -m src.mtgv2.definitions
+   dagster api grpc -p <PORT> -h 0.0.0.0 (localhost)
    ```
 
 2. Create/update `workspace.yaml` to point to that server:
