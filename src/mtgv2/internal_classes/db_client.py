@@ -45,8 +45,10 @@ class DatabaseClient:
         """Push DataFrame to database"""
         if table_name is None:
             get_time = datetime.now()
-            table_name = f"all_card_{get_time.strftime('%Y_%m_%d')}"
+            table_name = f"None_{get_time.strftime('%Y_%m_%d')}"
 
+        get_time = datetime.now()
+        table_name = f"{table_name}_{get_time.strftime('%Y_%m_%d')}"
         if self.is_duckdb:
             return self._push_duckdb(df, table_name)
         else:
