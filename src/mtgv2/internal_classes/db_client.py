@@ -103,7 +103,7 @@ class DatabaseClient:
             # SQLite or other databases
             df.to_sql(table_name, self.engine, index=False, if_exists="replace")
 
-        return "Pushed to database."
+        return table_name
 
     def get(self, table_name: str) -> pd.DataFrame:
         """Get DataFrame from database"""

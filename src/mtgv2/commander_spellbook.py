@@ -26,14 +26,12 @@ class CommanderSpellbookClient(APIClient):
             response.raise_for_status()
             data = response.json()
 
-            # Appends to list. Use .extend because it works with dic.
             all_results.extend(data["results"])
             has_next = data.get("next") is not None
             offset += limit
 
-        # create all lowercase columns
         df = pd.DataFrame(all_results)
-        df = df.columns.str.lower()
+        df.columns = df.columns.str.lower()
         return df
 
     def push(self, df: pd.DataFrame) -> str:

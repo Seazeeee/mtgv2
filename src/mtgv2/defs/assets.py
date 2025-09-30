@@ -144,10 +144,8 @@ def push_to_temp_duckdb(get_scryfall_cards: pd.DataFrame) -> str:
     group_name="BRONZE_TO_SILVER",
     kinds={"postgres"},
 )
-def pull_scryfall_table() -> pd.DataFrame:
+def pull_scryfall_table(push_to_database: dict) -> pd.DataFrame:
     load_dotenv()
     DB_URI = os.getenv("DB_URI")
     client = DatabaseClient(uri=str(DB_URI))
-    get_time = datetime.now()
-    table_name = f"all_card_{get_time.strftime('%Y_%m_%d')}"
-    return client.get(table_name=table_name)
+    return client.get(table_name=push_to_database["scryfall_cards"])
