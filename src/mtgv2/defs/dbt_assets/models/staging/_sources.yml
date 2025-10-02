@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: mtg
+    schema: public
+    tables:
+      - name: scryfall_cards_raw
+        identifier: "{{ var('scryfall_table_name', 'scryfall_cards_raw') }}"
+      - name: cs_cards_raw
+        identifier: "{{ var('cs_cards_table_name', 'cs_cards_raw') }}"

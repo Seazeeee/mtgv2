@@ -1,0 +1,19 @@
+name: mtg
+
+profile: mtg
+
+seed-paths: ["seeds"]
+model-paths: ["models"]
+macro-paths: ["macros"]
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  dbt_assets:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+flags:
+  require_generic_test_arguments_property: true
