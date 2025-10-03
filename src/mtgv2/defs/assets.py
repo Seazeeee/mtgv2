@@ -1,11 +1,13 @@
 from dagster import asset
 from dotenv import load_dotenv
+import dagster as dg
 import pandas as pd
 import os
-from datetime import datetime
 from mtgv2.scryfall import ScryfallClient
 from mtgv2.commander_spellbook import CommanderSpellbookClient
 from mtgv2.internal_classes.db_client import DatabaseClient
+from dagster_dbt import DbtCliResource, dbt_assets
+from mtgv2.dbt_resource import dbt_project
 
 
 @asset(
@@ -123,6 +125,11 @@ def push_to_database(
     )
 
     return results
+
+
+@dbt_assets(manifest=dbt_project.manifest_path)
+def dbt_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
+    yield from dbt.cli(["build"], context=context).stream()
 
 
 # Test assets
