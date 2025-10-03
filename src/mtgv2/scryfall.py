@@ -1,6 +1,5 @@
 import requests
 from dotenv import load_dotenv  # noqa: F401
-from datetime import datetime
 import pandas as pd
 from .internal_classes.api_base import APIClient
 from .internal_classes.db_client import DatabaseClient
@@ -26,10 +25,6 @@ class ScryfallClient(APIClient):
 
         # Create a dataframe from all cards
         df = pd.DataFrame(all_cards.json())
-
-        # Insert the date on index 0
-        current_date = datetime.now()
-        df.insert(0, "date", current_date)
 
         # Ensure that all columns are lower
         df.columns.str.lower()
