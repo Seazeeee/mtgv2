@@ -1,6 +1,5 @@
 import requests
 from dotenv import load_dotenv  # noqa: F401
-from datetime import datetime
 import pandas as pd
 from .internal_classes.api_base import APIClient
 from .internal_classes.db_client import DatabaseClient
