@@ -142,7 +142,7 @@ def dbt_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
 def push_to_temp_duckdb(get_scryfall_cards: pd.DataFrame) -> str:
     """Testing: Pushes to in-memory DuckDB"""
     client = DatabaseClient(uri=":memory:")
-    return client.push(get_scryfall_cards)
+    return client.push(get_scryfall_cards, table_name="scryfall_cards_test")
 
 
 @asset(

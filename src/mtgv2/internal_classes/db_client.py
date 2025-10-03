@@ -1,9 +1,9 @@
 import csv
 import duckdb
 import pandas as pd
-from datetime import datetime
 from sqlalchemy import create_engine, inspect
 from io import StringIO
+from datetime import datetime, timedelta
 
 
 class DatabaseClient:
@@ -179,7 +179,7 @@ class DatabaseClient:
             pd.DataFrame: A pandas df that contains table data where
             partition_date <= 30 days.
         """
-        ref_date = pd.Timestamp.now()
-        time_difference = pd.Timedelta(days=30)
+        ref_date = datetime.now().date()
+        time_difference = timedelta(days=30)
 
         return df[df["_partition_date"] <= (ref_date + time_difference)]
