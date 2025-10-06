@@ -1,7 +1,9 @@
 import csv
 import duckdb
+import hashlib
+import json
 import pandas as pd
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine, inspect, delete, MetaData, Table
 from io import StringIO
 from datetime import datetime, timedelta
 
@@ -44,6 +46,9 @@ class DatabaseClient:
     def push(self, df: pd.DataFrame, table_name: str | None = None) -> str:
         """Push DataFrame to database"""
 
+        if table_name is None:
+            raise ValueError("Please provide a table_name")
+
         # Partition DF
         get_time = datetime.now()
         df.insert(loc=0, column="_loaded_at", value=get_time)
@@ -65,8 +70,6 @@ class DatabaseClient:
         # Remove partitions older than 30 days
         df_final = self.delete_partition(df=df_combined)
 
-        if table_name is None:
-            raise ValueError("Please provide a table_name")
         if self.is_duckdb:
             return self._push_duckdb(df_final, table_name)
         else:
@@ -105,25 +108,24 @@ class DatabaseClient:
         """Push using SQLAlchemy (PostgreSQL, SQLite, etc.)"""
         if self.dialect == "postgresql":
             try:
-                df.to_sql(
-                    table_name,
-                    self.engine,
-                    method=self.psql_insert_copy,
-                    index=False,
-                    if_exists="replace",
-                )
+                if inspect(self.engine).has_table(table_name):
+                    with self.engine.begin() as conn:
+                        metadata = MetaData()
+                        table = Table(table_name, metadata, autoload_with=self.engine)
+                        conn.execute(delete(table))
+
+                        df.to_sql(
+                            table_name,
+                            self.engine,
+                            method=self.psql_insert_copy,
+                            index=False,
+                            if_exists="append",
+                        )
             except ValueError as e:
-                print(f"{e}")
-                print("Attempting to pull data from already existing table.")
-                print(f"Pulling table: {table_name}")
-                return (
-                    f"{table_name} found in database."
-                    if inspect(self.engine).has_table(table_name)
-                    else f"Error: {str(e)}"
-                )
+                return f"Error: {e}"
         else:
             # SQLite or other databases
-            df.to_sql(table_name, self.engine, index=False, if_exists="replace")
+            df.to_sql(table_name, self.engine, index=False, if_exists="fail")
 
         return table_name
 
@@ -181,5 +183,7 @@ class DatabaseClient:
         """
         ref_date = datetime.now().date()
         time_difference = timedelta(days=30)
+
+        df["_partition_date"] = pd.to_datetime(df["_partition_date"]).dt.date
 
         return df[df["_partition_date"] <= (ref_date + time_difference)]

@@ -1,12 +1,14 @@
-from dagster import asset
-from dotenv import load_dotenv
 import dagster as dg
 import pandas as pd
 import os
+from collections.abc import Mapping
+from typing import Any, Optional
+from dagster import asset, AssetKey
+from dotenv import load_dotenv
 from mtgv2.scryfall import ScryfallClient
 from mtgv2.commander_spellbook import CommanderSpellbookClient
 from mtgv2.internal_classes.db_client import DatabaseClient
-from dagster_dbt import DbtCliResource, dbt_assets
+from dagster_dbt import DbtCliResource, dbt_assets, DagsterDbtTranslator
 from mtgv2.dbt_resource import dbt_project
 
 
@@ -127,7 +129,93 @@ def push_to_database(
     return results
 
 
-@dbt_assets(manifest=dbt_project.manifest_path)
+# PULL JOBS
+@asset(
+    description="""Pulls the scryfall cards table with today's date from the database""",
+    deps=["push_to_database"],
+    group_name="BRONZE_TO_SILVER",
+    kinds={"postgres"},
+)
+def pull_scryfall_table(push_to_database: dict) -> pd.DataFrame:
+    load_dotenv()
+    DB_URI = os.getenv("DB_URI")
+    client = DatabaseClient(uri=str(DB_URI))
+    return client.get(table_name=push_to_database["scryfall_cards"])
+
+
+@asset(
+    description="""Pulls the commanderspellbook cards table with today's date from the database""",
+    deps=["push_to_database"],
+    group_name="BRONZE_TO_SILVER",
+    kinds={"postgres"},
+)
+def pull_cs_cards_table(push_to_database: dict) -> pd.DataFrame:
+    load_dotenv()
+    DB_URI = os.getenv("DB_URI")
+    client = DatabaseClient(uri=str(DB_URI))
+    return client.get(table_name=push_to_database["cs_cards"])
+
+
+@asset(
+    description="""Pulls the commanderspellbook variants table with today's date from the database""",
+    deps=["push_to_database"],
+    group_name="BRONZE_TO_SILVER",
+    kinds={"postgres"},
+)
+def pull_cs_variants_table(push_to_database: dict) -> pd.DataFrame:
+    load_dotenv()
+    DB_URI = os.getenv("DB_URI")
+    client = DatabaseClient(uri=str(DB_URI))
+    return client.get(table_name=push_to_database["cs_variants"])
+
+
+@asset(
+    description="""Pulls the commanderspellbook features table with today's date from the database""",
+    deps=["push_to_database"],
+    group_name="BRONZE_TO_SILVER",
+    kinds={"postgres"},
+)
+def pull_cs_features_table(push_to_database: dict) -> pd.DataFrame:
+    load_dotenv()
+    DB_URI = os.getenv("DB_URI")
+    client = DatabaseClient(uri=str(DB_URI))
+    return client.get(table_name=push_to_database["cs_features"])
+
+
+@asset(
+    description="""Pulls the commanderspellbook templates table with today's date from the database""",
+    deps=["push_to_database"],
+    group_name="BRONZE_TO_SILVER",
+    kinds={"postgres"},
+)
+def pull_cs_templates_table(push_to_database: dict) -> pd.DataFrame:
+    load_dotenv()
+    DB_URI = os.getenv("DB_URI")
+    client = DatabaseClient(uri=str(DB_URI))
+    return client.get(table_name=push_to_database["cs_templates"])
+
+
+# DBT
+class CustomDagsterDbtTranslator(DagsterDbtTranslator):
+    def get_group_name(self, dbt_resource_props: Mapping[str, Any]) -> Optional[str]:
+        return "BRONZE_TO_SILVER"
+
+    def get_asset_key(self, dbt_resource_props):
+        key = super().get_asset_key(dbt_resource_props)  # default
+
+        # dbt_resorce_props is a dict with this metadata:
+        # https://schemas.getdbt.com/dbt/manifest/v11/index.html#nodes_additionalProperties
+        if dbt_resource_props["resource_type"] == "source":
+            # adjust the key as necessary, here removing the prefix
+            key = AssetKey(dbt_resource_props["name"])
+
+        return key
+
+
+@dbt_assets(
+    manifest=dbt_project.manifest_path,
+    dagster_dbt_translator=CustomDagsterDbtTranslator(),
+)
 def dbt_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
 
@@ -143,16 +231,3 @@ def push_to_temp_duckdb(get_scryfall_cards: pd.DataFrame) -> str:
     """Testing: Pushes to in-memory DuckDB"""
     client = DatabaseClient(uri=":memory:")
     return client.push(get_scryfall_cards, table_name="scryfall_cards_test")
-
-
-@asset(
-    description="""Pulls the scryfall cards table with today's date from the database""",
-    deps=["push_to_database"],
-    group_name="BRONZE_TO_SILVER",
-    kinds={"postgres"},
-)
-def pull_scryfall_table(push_to_database: dict) -> pd.DataFrame:
-    load_dotenv()
-    DB_URI = os.getenv("DB_URI")
-    client = DatabaseClient(uri=str(DB_URI))
-    return client.get(table_name=push_to_database["scryfall_cards"])
