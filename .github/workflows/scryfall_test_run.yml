@@ -31,9 +31,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e ".[test]"
 
-    - name: Create DBT profiles directory
-      run: |
-          mkdir -p /home/runner/.dbt
+    - name: Remove dbt
+      run: pip uninstall -y dbt-core dbt-postgres
           
     - name: Run pipeline tests
       run: |
