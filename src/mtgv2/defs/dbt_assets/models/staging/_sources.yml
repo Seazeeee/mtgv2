@@ -6,27 +6,10 @@ sources:
     database: mtg
     tables:
       - name: scryfall_cards_raw
-        config:
-          meta:
-            dagster:
-              asset_key: ["push_to_database"]
       - name: cs_cards_raw
-        config:
-          meta:
-            dagster:
-              asset_key: ["push_to_database"]
       - name: cs_variants_raw
-        config:
-          meta:
-            dagster:
-              asset_key: ["push_to_database"]
       - name: cs_features_raw
-        config:
-          meta:
-            dagster:
-              asset_key: ["push_to_database"]
       - name: cs_templates_raw
-        config:
-          meta:
-            dagster:
-              asset_key: ["push_to_database"]
+  - name: dagster
+    tables:
+      - name: "pull_scryfall_table"
