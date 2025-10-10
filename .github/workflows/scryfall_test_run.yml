@@ -30,7 +30,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[test]"
-    
+
+    - name: Create DBT profiles directory
+      run: |
+          mkdir -p /home/runner/.dbt
+          
     - name: Run pipeline tests
       run: |
         pytest test/scryfall_job_test.py -v --tb=short
