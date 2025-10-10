@@ -40,6 +40,10 @@ jobs:
         echo "    dev:" >> /home/runner/.dbt/profiles.yml
         echo "      type: duckdb" >> /home/runner/.dbt/profiles.yml
         echo "      path: ':memory:'" >> /home/runner/.dbt/profiles.yml
+
+    - name: Dbt Compile
+      run: |
+        dbt compile --project-dir src/mtgv2/defs/dbt_assets
             
     - name: Run pipeline tests
       run: |
