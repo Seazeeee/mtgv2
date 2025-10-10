@@ -34,7 +34,7 @@ jobs:
     - name: Create minimal dbt profiles.yml
       run: |
         mkdir -p /home/runner/.dbt
-        echo "ci_duckdb:" > /home/runner/.dbt/profiles.yml
+        echo "mtg:" > /home/runner/.dbt/profiles.yml
         echo "  target: dev" >> /home/runner/.dbt/profiles.yml
         echo "  outputs:" >> /home/runner/.dbt/profiles.yml
         echo "    dev:" >> /home/runner/.dbt/profiles.yml
