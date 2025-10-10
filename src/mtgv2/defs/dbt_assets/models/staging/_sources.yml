@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: mtgv2
+    schema: public
+    database: mtg
+    tables:
+      - name: scryfall_cards_raw
+      - name: cs_cards_raw
+      - name: cs_variants_raw
+      - name: cs_features_raw
+      - name: cs_templates_raw
+  - name: dagster
+    tables:
+      - name: "pull_scryfall_table"
