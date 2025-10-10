@@ -10,7 +10,6 @@ scryfall_job = dg.define_asset_job(
         "get_scryfall_cards",
         "push_to_database",
         "get_commanderspellbook_cards",
-        "get_commanderspellbook_variants",
         "get_commanderspellbook_features",
         "get_commanderspellbook_templates",
     ],
@@ -29,5 +28,13 @@ pull_from_db_job = dg.define_asset_job(
         "pull_cs_features_table",
         "pull_cs_templates_table",
         "clean_cards",
+    ],
+)
+
+large_data_job = dg.define_asset_job(
+    name="large_data_job",
+    selection=[
+        "push_variants_to_database",
+        "get_commanderspellbook_variants",
     ],
 )

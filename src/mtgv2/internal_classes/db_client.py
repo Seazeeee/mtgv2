@@ -1,8 +1,7 @@
 import csv
 import duckdb
-import hashlib
-import json
 import pandas as pd
+import types
 from sqlalchemy import create_engine, inspect, delete, MetaData, Table
 from io import StringIO
 from datetime import datetime, timedelta
@@ -43,37 +42,60 @@ class DatabaseClient:
             sql = "COPY {} ({}) FROM STDIN WITH CSV".format(table_name, columns)
             cur.copy_expert(sql=sql, file=s_buf)
 
-    def push(self, df: pd.DataFrame, table_name: str | None = None) -> str:
+    def push(
+        self,
+        df: pd.DataFrame,
+        table_name: str | None = None,
+    ) -> str:
         """Push DataFrame to database"""
 
         if table_name is None:
             raise ValueError("Please provide a table_name")
 
-        # Partition DF
-        get_time = datetime.now()
-        df.insert(loc=0, column="_loaded_at", value=get_time)
-        df.insert(loc=1, column="_partition_date", value=get_time.date())
-
-        # Try to get existing data from the table
-        try:
-            df_existing = self.get(table_name=str(table_name))
-        except ValueError:
-            # Table doesn't exist yet, use empty DataFrame
-            df_existing = pd.DataFrame()
-
-        # Combine old and new data
-        if not df_existing.empty:
-            df_combined = pd.concat([df_existing, df], ignore_index=True)
+        if isinstance(df, types.GeneratorType):
+            dfs = df
         else:
-            df_combined = df
+            # We wrap this as a single iterator so that one
+            # set of code can handle both generator and non-generator.
+            dfs = iter([df])
 
-        # Remove partitions older than 30 days
-        df_final = self.delete_partition(df=df_combined)
+        first_batch = True
 
-        if self.is_duckdb:
-            return self._push_duckdb(df_final, table_name)
-        else:
-            return self._push_sqlalchemy(df_final, table_name)
+        for df in dfs:
+            # Partition DF
+            get_time = datetime.now()
+            df.insert(loc=0, column="_loaded_at", value=get_time)
+            df.insert(loc=1, column="_partition_date", value=get_time.date())
+
+            # Try to get existing data from the table
+            if first_batch:
+                try:
+                    df_existing = self.get(table_name=str(table_name))
+                except ValueError:
+                    # Table doesn't exist yet, use empty DataFrame
+                    df_existing = pd.DataFrame()
+            else:
+                df_existing = pd.DataFrame()
+
+            # Combine old and new data
+            if not df_existing.empty:
+                df_combined = pd.concat([df_existing, df], ignore_index=True)
+            else:
+                df_combined = df
+
+            # Remove partitions older than 30 days
+            df_final = self.delete_partition(df=df_combined)
+
+            print(f"Pushing to SQLAlchemy: {table_name} ({len(df_final)} rows)")
+
+            if self.is_duckdb:
+                result = self._push_duckdb(df_final, table_name)
+            else:
+                result = self._push_sqlalchemy(df_final, table_name)
+
+            first_batch = False
+
+        return result or table_name
 
     def _push_duckdb(self, df: pd.DataFrame, table_name: str) -> str:
         """Push to in-memory DuckDB"""
@@ -105,27 +127,33 @@ class DatabaseClient:
             conn.close()
 
     def _push_sqlalchemy(self, df: pd.DataFrame, table_name: str) -> str:
-        """Push using SQLAlchemy (PostgreSQL, SQLite, etc.)"""
+        """Push using SQLAlchemy"""
         if self.dialect == "postgresql":
             try:
+                # If table exists, delete it (rebuild pattern)
                 if inspect(self.engine).has_table(table_name):
                     with self.engine.begin() as conn:
                         metadata = MetaData()
                         table = Table(table_name, metadata, autoload_with=self.engine)
                         conn.execute(delete(table))
+                    if_exists_mode = "append"
+                else:
+                    if_exists_mode = "replace"
 
-                        df.to_sql(
-                            table_name,
-                            self.engine,
-                            method=self.psql_insert_copy,
-                            index=False,
-                            if_exists="append",
-                        )
-            except ValueError as e:
-                return f"Error: {e}"
+                # Always write data, even if the table didn't exist before
+                df.to_sql(
+                    table_name,
+                    self.engine,
+                    method=self.psql_insert_copy,
+                    index=False,
+                    if_exists=if_exists_mode,
+                )
+
+            except Exception as e:
+                print(f"SQLAlchemy push failed: {e}")
+                raise
         else:
-            # SQLite or other databases
-            df.to_sql(table_name, self.engine, index=False, if_exists="fail")
+            df.to_sql(table_name, self.engine, index=False, if_exists="replace")
 
         return table_name
 

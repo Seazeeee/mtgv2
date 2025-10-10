@@ -13,7 +13,6 @@ class CommanderSpellbookClient(APIClient):
     def fetch(self):
         """Supports Pagination due to how this API works."""
         uri = self.uri
-        all_results = []
         offset = 0
         limit = 100
         has_next = True
@@ -26,21 +25,22 @@ class CommanderSpellbookClient(APIClient):
             response.raise_for_status()
             data = response.json()
 
-            all_results.extend(data["results"])
+            # Fixes OOM error and loads df incramentally.
+            if data:
+                df = pd.DataFrame(data)
+                df.columns = df.columns.str.lower()
+                yield df
+
             has_next = data.get("next") is not None
             offset += limit
 
-        df = pd.DataFrame(all_results)
-        df.columns = df.columns.str.lower()
-        return df
-
-    def push(self, df: pd.DataFrame) -> str:
+    def push(self, df_generator, table_name: str) -> str:
         if not self.db_uri:
             raise ValueError("No database URI provided for push()")
 
         db = DatabaseClient(uri=self.db_uri)
 
-        return db.push(df)
+        return db.push(df_generator, table_name)
 
     def pull(self, table_name: str) -> pd.DataFrame:
         if not self.db_uri:
