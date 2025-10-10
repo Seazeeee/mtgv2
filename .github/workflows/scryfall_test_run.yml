@@ -43,6 +43,7 @@ jobs:
 
     - name: Dbt Compile
       run: |
+        dbt deps --project-dir src/mtgv2/defs/dbt_assets
         dbt compile --project-dir src/mtgv2/defs/dbt_assets
             
     - name: Run pipeline tests
