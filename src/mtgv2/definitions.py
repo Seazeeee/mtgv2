@@ -5,6 +5,7 @@ from .defs.jobs import (
     scryfall_job_test,
     pull_from_db_job,
     large_data_job,
+    create_all_views_job,
 )
 from .dbt_resource import dbt_resource
 from mtgv2.defs import assets
@@ -18,6 +19,7 @@ defs = Definitions(
         scryfall_job_test,
         pull_from_db_job,
         large_data_job,
+        create_all_views_job,
     ],
     assets=all_assets,
     resources={"dbt": dbt_resource},
