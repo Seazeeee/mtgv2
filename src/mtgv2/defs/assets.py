@@ -172,7 +172,7 @@ def pull_cs_cards_table(push_to_database: dict) -> pd.DataFrame:
 
 @asset(
     description="""Pulls the commanderspellbook variants table with today's date from the database""",
-    deps=["push_to_database"],
+    deps=["push_variants_to_database"],
     group_name="BRONZE_TO_SILVER",
     kinds={"postgres"},
 )

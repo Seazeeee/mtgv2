@@ -27,7 +27,7 @@ pull_from_db_job = dg.define_asset_job(
         "pull_cs_variants_table",
         "pull_cs_features_table",
         "pull_cs_templates_table",
-        "clean_cards",
+        "clean_sf_cards",
     ],
 )
 
@@ -36,5 +36,18 @@ large_data_job = dg.define_asset_job(
     selection=[
         "push_variants_to_database",
         "get_commanderspellbook_variants",
+    ],
+)
+
+create_all_views_job = dg.define_asset_job(
+    name="create_all_views_job",
+    selection=[
+        "pull_scryfall_table",
+        "pull_cs_cards_table",
+        "pull_cs_variants_table",
+        "pull_cs_features_table",
+        "pull_cs_templates_table",
+        "clean_sf_cards",
+        "clean_cs_cards",
     ],
 )
