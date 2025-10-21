@@ -1,22 +1,25 @@
+-- models/staging/stg_cs_cards.sql
+-- Cleans and standardizes Commander Spellbook cards data
+
 WITH source AS (
     SELECT * FROM {{ source('dagster', 'pull_cs_cards_table') }}
 ),
 
-cs_cards_cleaned AS (
+cleaned AS (
     SELECT 
         -- Timestamps
         _loaded_at,
         _partition_date,
         
         -- Core identifiers
-        id,
-        TRIM(name) AS name,
+        id AS cs_card_id,
+        TRIM(name) AS card_name,
         oracleid AS oracle_id,
         
         -- Card properties
         UPPER(TRIM(identity)) AS color_identity,
         manavalue AS cmc,
-        spoiler::BOOLEAN,
+        spoiler::BOOLEAN AS is_spoiler,
         TRIM(typeline) AS type_line,
         TRIM(oracletext) AS oracle_text,
         
@@ -40,12 +43,12 @@ cs_cards_cleaned AS (
         variantcount::INTEGER AS variant_count,
         
         -- Boolean flags
-        reserved::BOOLEAN,
-        reprinted::BOOLEAN,
-        gamechanger::BOOLEAN,
-        tutor::BOOLEAN,
-        extraturn::BOOLEAN,
-        masslanddenial::BOOLEAN,
+        reserved::BOOLEAN AS is_reserved,
+        reprinted::BOOLEAN AS is_reprinted,
+        gamechanger::BOOLEAN AS is_gamechanger,
+        tutor::BOOLEAN AS is_tutor,
+        extraturn::BOOLEAN AS is_extraturn,
+        masslanddenial::BOOLEAN AS is_masslanddenial,
         
         -- Image URIs - clean up URLs
         NULLIF(TRIM(imageurifrontpng::TEXT), '') AS image_uri_front_png,
@@ -86,4 +89,4 @@ cs_cards_cleaned AS (
     WHERE oracleid IS NOT NULL
 )
 
-SELECT * FROM cs_cards_cleaned
+SELECT * FROM cleaned
