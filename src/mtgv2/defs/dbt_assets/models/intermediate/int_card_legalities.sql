@@ -7,6 +7,7 @@ WITH scryfall_cards AS (
         card_name,
         type_line,
         color_identity,
+        cmc,
         legal_brawl,
         legal_predh,
         legal_legacy,
@@ -28,6 +29,7 @@ cs_cards AS (
         card_name,
         type_line,
         color_identity,
+        cmc,
         legal_commander,
         legal_paupercommandermain,
         legal_paupercommander,
@@ -51,6 +53,7 @@ unified_legalities AS (
         COALESCE(sf.card_name, cs.card_name) AS card_name,
         COALESCE(sf.type_line, cs.type_line) AS type_line,
         COALESCE(sf.color_identity, cs.color_identity) AS color_identity,
+        COALESCE(sf.cmc, cs.cmc) AS cmc,
         
         -- Prefer Scryfall legalities, fallback to CS
         COALESCE(sf.legal_brawl, cs.legal_brawl) AS legal_brawl,
@@ -78,6 +81,7 @@ normalized_legalities AS (
         card_name,
         type_line,
         color_identity,
+        cmc,
         
         -- Standardize legality values (LEGAL, BANNED, RESTRICTED, NULL)
         CASE 
@@ -181,6 +185,7 @@ format_metrics AS (
         card_name,
         type_line,
         color_identity,
+        cmc,
         
         -- Individual legalities
         brawl_legality,
@@ -237,7 +242,7 @@ format_metrics AS (
         
     FROM normalized_legalities
     GROUP BY 
-        oracle_id, card_name, type_line, color_identity,
+        oracle_id, card_name, type_line, color_identity, cmc,
         brawl_legality, predh_legality, legacy_legality, modern_legality,
         pauper_legality, pioneer_legality, vintage_legality, standard_legality,
         commander_legality, premodern_legality, oathbreaker_legality,

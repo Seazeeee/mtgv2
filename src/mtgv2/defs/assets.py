@@ -223,8 +223,8 @@ class CustomDagsterDbtTranslator(DagsterDbtTranslator):
                 return "staging"
             elif folder == "intermediate":
                 return "intermediate"
-            elif folder == "mart":
-                return "mart"
+            elif folder == "marts":
+                return "marts"
 
         # Default fallback
         return "default"
@@ -245,7 +245,7 @@ class CustomDagsterDbtTranslator(DagsterDbtTranslator):
     select="path:models/staging",
 )
 def dbt_staging_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["run", "--target", "staging"], context=context).stream()
+    yield from dbt.cli(["run"], context=context).stream()
 
 
 @dbt_assets(
@@ -254,7 +254,7 @@ def dbt_staging_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
     select="path:models/intermediate",
 )
 def dbt_intermediate_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["run", "--target", "intermediate"], context=context).stream()
+    yield from dbt.cli(["run"], context=context).stream()
 
 
 @dbt_assets(
@@ -263,7 +263,7 @@ def dbt_intermediate_models(context: dg.AssetExecutionContext, dbt: DbtCliResour
     select="path:models/marts",
 )
 def dbt_mart_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["run", "--target", "marts"], context=context).stream()
+    yield from dbt.cli(["run"], context=context).stream()
 
 
 # Test assets

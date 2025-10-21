@@ -13,12 +13,12 @@ models:
   dbt_assets:
     staging:
       +materialized: view
-      +target: staging
+      +schema: mtg_staging
     intermediate:
       +materialized: view
-      +target: intermediate
+      +schema: mtg_intermediate
     marts:
       +materialized: table
-      +target: marts
+      +schema: mtg_marts
 flags:
   require_generic_test_arguments_property: true

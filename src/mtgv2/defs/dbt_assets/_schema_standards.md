@@ -1,4 +1,3 @@
--- models/staging/\_schema_standards.md
 -- Standardized Schema Conventions for MTG Commander Spellbook Data
 
 ## Data Structure Overview

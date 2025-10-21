@@ -34,62 +34,58 @@ WITH combo_data AS (
     FROM {{ ref('mart_combo_analysis') }}
 ),
 
--- Extract card names from combo_cards field
--- This is a simplified approach - you may need to adjust based on actual JSON structure
+-- Extract card names from combo_cards field using LATERAL join
+-- This approach properly handles set-returning functions
 card_extractions AS (
     SELECT 
-        variant_id,
-        description,
-        notes,
-        complexity_level,
-        difficulty_level,
-        price_tier,
-        legal_formats_count,
-        estimated_card_count,
-        estimated_feature_count,
-        mana_value_needed,
-        popularity,
-        bracket_tag,
-        best_price,
-        combo_cards,
-        combo_uses,
-        combo_includes,
-        combo_produces,
-        combo_requires,
-        legal_commander,
-        legal_modern,
-        legal_legacy,
-        legal_vintage,
-        legal_pauper,
-        legal_pioneer,
-        legal_standard,
-        legal_brawl,
-        legal_oathbreaker,
-        legal_paupercommander,
+        cd.variant_id,
+        cd.description,
+        cd.notes,
+        cd.complexity_level,
+        cd.difficulty_level,
+        cd.price_tier,
+        cd.legal_formats_count,
+        cd.estimated_card_count,
+        cd.estimated_feature_count,
+        cd.mana_value_needed,
+        cd.popularity,
+        cd.bracket_tag,
+        cd.best_price,
+        cd.combo_cards,
+        cd.combo_uses,
+        cd.combo_includes,
+        cd.combo_produces,
+        cd.combo_requires,
+        cd.legal_commander,
+        cd.legal_modern,
+        cd.legal_legacy,
+        cd.legal_vintage,
+        cd.legal_pauper,
+        cd.legal_pioneer,
+        cd.legal_standard,
+        cd.legal_brawl,
+        cd.legal_oathbreaker,
+        cd.legal_paupercommander,
         
-        -- Extract individual card names (adjust regex based on actual format)
-        CASE 
-            WHEN combo_cards IS NOT NULL AND combo_cards != '' THEN
-                TRIM(REGEXP_SPLIT_TO_TABLE(
-                    REGEXP_REPLACE(combo_cards, '[\[\]{}"]', '', 'g'), 
-                    ','
-                ))
-            ELSE NULL
-        END AS card_name,
+        -- Extract individual card names using LATERAL join
+        TRIM(card_name) AS card_name,
         
         -- Extract card positions (for ordering)
         ROW_NUMBER() OVER (
-            PARTITION BY variant_id 
-            ORDER BY REGEXP_SPLIT_TO_TABLE(
-                REGEXP_REPLACE(combo_cards, '[\[\]{}"]', '', 'g'), 
-                ','
-            )
+            PARTITION BY cd.variant_id 
+            ORDER BY card_name
         ) AS card_position
         
-    FROM combo_data
-    WHERE combo_cards IS NOT NULL 
-      AND combo_cards != '' 
-      AND combo_cards != 'null'
+    FROM combo_data cd
+    CROSS JOIN LATERAL (
+        SELECT unnest(string_to_array(
+            REGEXP_REPLACE(cd.combo_cards, '[\[\]{}"]', '', 'g'), 
+            ','
+        )) AS card_name
+    ) AS card_split
+    WHERE cd.combo_cards IS NOT NULL 
+      AND cd.combo_cards != '' 
+      AND cd.combo_cards != 'null'
 ),
 
 -- Clean up card names and filter out empty ones

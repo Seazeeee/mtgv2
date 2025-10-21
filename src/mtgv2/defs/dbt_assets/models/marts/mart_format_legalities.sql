@@ -8,9 +8,6 @@ WITH card_legalities AS (
         type_line,
         color_identity,
         cmc,
-        rarity,
-        set_name,
-        released_date,
         legal_formats_count,
         banned_formats_count,
         is_commander_legal,
@@ -61,9 +58,9 @@ SELECT
     cl.type_line,
     cl.color_identity,
     cl.cmc,
-    cl.rarity,
-    cl.set_name,
-    cl.released_date,
+    cc.rarity,
+    cc.set_name,
+    cc.released_date,
     
     -- Pricing (from card catalog)
     cc.best_usd_price,
