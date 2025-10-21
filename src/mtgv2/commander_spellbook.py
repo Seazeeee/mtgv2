@@ -25,9 +25,11 @@ class CommanderSpellbookClient(APIClient):
             response.raise_for_status()
             data = response.json()
 
+            results = data.get("results", [])
+
             # Fixes OOM error and loads df incramentally.
-            if data:
-                df = pd.DataFrame(data)
+            if results:
+                df = pd.DataFrame(pd.json_normalize(results))
                 df.columns = df.columns.str.lower()
                 yield df
 

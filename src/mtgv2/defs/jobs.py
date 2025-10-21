@@ -27,8 +27,22 @@ pull_from_db_job = dg.define_asset_job(
         "pull_cs_variants_table",
         "pull_cs_features_table",
         "pull_cs_templates_table",
-        "clean_cards",
     ],
+)
+
+create_staging_views_job = dg.define_asset_job(
+    name="create_staging_views_job",
+    selection=dg.AssetSelection.groups("staging"),  # Adjust based on your group name
+)
+
+create_intermediate_models_job = dg.define_asset_job(
+    name="create_intermediate_models_job",
+    selection=dg.AssetSelection.groups("intermediate"),
+)
+
+create_mart_models_job = dg.define_asset_job(
+    name="create_mart_models_job",
+    selection=dg.AssetSelection.groups("marts"),
 )
 
 large_data_job = dg.define_asset_job(
@@ -36,5 +50,21 @@ large_data_job = dg.define_asset_job(
     selection=[
         "push_variants_to_database",
         "get_commanderspellbook_variants",
+    ],
+)
+
+create_all_views_job = dg.define_asset_job(
+    name="create_all_views_job",
+    selection=[
+        "pull_scryfall_table",
+        "pull_cs_cards_table",
+        "pull_cs_variants_table",
+        "pull_cs_features_table",
+        "pull_cs_templates_table",
+        "stg_scryfall_cards",
+        "stg_cs_cards",
+        "stg_cs_variants",
+        "stg_cs_features",
+        "stg_cs_templates",
     ],
 )

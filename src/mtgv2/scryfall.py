@@ -24,7 +24,7 @@ class ScryfallClient(APIClient):
         all_cards.raise_for_status()
 
         # Create a dataframe from all cards
-        df = pd.DataFrame(all_cards.json())
+        df = pd.DataFrame(pd.json_normalize(all_cards.json()))
 
         # Ensure that all columns are lower
         df.columns.str.lower()

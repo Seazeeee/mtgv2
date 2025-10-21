@@ -11,5 +11,15 @@ sources:
       - name: cs_features_raw
       - name: cs_templates_raw
   - name: dagster
+    schema: public
     tables:
       - name: "pull_scryfall_table"
+        identifier: scryfall_cards_raw
+      - name: "pull_cs_cards_table"
+        identifier: cs_cards_raw
+      - name: "pull_cs_variants_table"
+        identifier: cs_variants_raw
+      - name: "pull_cs_features_table"
+        identifier: cs_features_raw
+      - name: "pull_cs_templates_table"
+        identifier: cs_templates_raw

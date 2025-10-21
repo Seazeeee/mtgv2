@@ -172,7 +172,7 @@ def pull_cs_cards_table(push_to_database: dict) -> pd.DataFrame:
 
 @asset(
     description="""Pulls the commanderspellbook variants table with today's date from the database""",
-    deps=["push_to_database"],
+    deps=["push_variants_to_database"],
     group_name="BRONZE_TO_SILVER",
     kinds={"postgres"},
 )
@@ -212,26 +212,58 @@ def pull_cs_templates_table(push_to_database: dict) -> pd.DataFrame:
 # DBT
 class CustomDagsterDbtTranslator(DagsterDbtTranslator):
     def get_group_name(self, dbt_resource_props: Mapping[str, Any]) -> Optional[str]:
-        return "BRONZE_TO_SILVER"
+        # Get the fully qualified name (path components)
+        fqn = dbt_resource_props.get("fqn", [])
+
+        # fqn is typically ['project_name', 'folder', 'subfolder', 'model_name']
+        # For models/staging/stg_customers.sql -> ['project', 'staging', 'stg_customers']
+        if len(fqn) > 1:
+            folder = fqn[1]  # Get the first folder after project name
+            if folder == "staging":
+                return "staging"
+            elif folder == "intermediate":
+                return "intermediate"
+            elif folder == "marts":
+                return "marts"
+
+        # Default fallback
+        return "default"
 
     def get_asset_key(self, dbt_resource_props):
         key = super().get_asset_key(dbt_resource_props)  # default
-
-        # dbt_resorce_props is a dict with this metadata:
+        # dbt_resource_props is a dict with this metadata:
         # https://schemas.getdbt.com/dbt/manifest/v11/index.html#nodes_additionalProperties
         if dbt_resource_props["resource_type"] == "source":
             # adjust the key as necessary, here removing the prefix
             key = AssetKey(dbt_resource_props["name"])
-
         return key
 
 
 @dbt_assets(
     manifest=dbt_project.manifest_path,
     dagster_dbt_translator=CustomDagsterDbtTranslator(),
+    select="path:models/staging",
 )
-def dbt_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["build"], context=context).stream()
+def dbt_staging_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
+    yield from dbt.cli(["run"], context=context).stream()
+
+
+@dbt_assets(
+    manifest=dbt_project.manifest_path,
+    dagster_dbt_translator=CustomDagsterDbtTranslator(),
+    select="path:models/intermediate",
+)
+def dbt_intermediate_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
+    yield from dbt.cli(["run"], context=context).stream()
+
+
+@dbt_assets(
+    manifest=dbt_project.manifest_path,
+    dagster_dbt_translator=CustomDagsterDbtTranslator(),
+    select="path:models/marts",
+)
+def dbt_mart_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
+    yield from dbt.cli(["run"], context=context).stream()
 
 
 # Test assets
