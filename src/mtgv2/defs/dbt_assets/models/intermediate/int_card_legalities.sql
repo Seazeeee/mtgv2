@@ -19,7 +19,7 @@ WITH scryfall_cards AS (
         legal_premodern,
         legal_oathbreaker,
         legal_paupercommander
-    FROM mtg_staging.stg_scryfall_cards
+    FROM {{ ref('stg_scryfall_cards') }}
 ),
 
 cs_cards AS (
@@ -41,7 +41,7 @@ cs_cards AS (
         legal_pioneer,
         legal_standard,
         legal_pauper
-    FROM mtg_staging.stg_cs_cards
+    FROM {{ ref('stg_cs_cards') }}
 ),
 
 -- Combine legalities from both sources

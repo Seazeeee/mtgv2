@@ -37,7 +37,7 @@ WITH combos AS (
         legal_oathbreaker,
         legal_paupercommander,
         legal_paupercommandermain
-    FROM mtg_staging.stg_cs_variants
+    FROM {{ ref('stg_cs_variants') }}
 ),
 
 -- Create basic combo summary without JSONB parsing

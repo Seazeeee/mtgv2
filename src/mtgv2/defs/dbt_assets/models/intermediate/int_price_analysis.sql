@@ -20,7 +20,7 @@ WITH scryfall_cards AS (
         price_eur,
         price_eur_foil,
         price_tix
-    FROM mtg_staging.stg_scryfall_cards
+    FROM {{ ref('stg_scryfall_cards') }}
 ),
 
 cs_cards AS (
@@ -35,7 +35,7 @@ cs_cards AS (
         price_tcgplayer,
         price_cardkingdom,
         price_cardmarket
-    FROM mtg_staging.stg_cs_cards
+    FROM {{ ref('stg_cs_cards') }}
 ),
 
 -- Combine pricing data from both sources

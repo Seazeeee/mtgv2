@@ -58,7 +58,7 @@ WITH scryfall_cards AS (
         legal_oathbreaker,
         legal_paupercommander,
         'scryfall' AS data_source
-    FROM mtg_staging.stg_scryfall_cards
+    FROM {{ ref('stg_scryfall_cards') }}
 ),
 
 cs_cards AS (
@@ -108,7 +108,7 @@ cs_cards AS (
         price_cardkingdom,
         price_cardmarket,
         'commander_spellbook' AS data_source
-    FROM mtg_staging.stg_cs_cards
+    FROM {{ ref('stg_cs_cards') }}
 ),
 
 -- Combine both sources, prioritizing Scryfall for core card data
