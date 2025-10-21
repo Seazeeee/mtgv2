@@ -100,14 +100,47 @@ Format legality status (uppercase):
 - `updated_at` - Record update timestamp
 - `released_date` - Card release date
 
-### Data Types
+### JSON Data Stored as TEXT
 
-- **Strings**: Always trimmed with `TRIM()`
-- **Booleans**: Explicit casting with `::BOOLEAN`
-- **Integers**: Explicit casting with `::INTEGER`
-- **Numeric**: Explicit casting with `::NUMERIC` and `ROUND(..., 2)`
-- **Arrays**: Proper array handling for keywords
-- **Timestamps**: Explicit casting with `::TIMESTAMP`
+**Important**: These columns contain JSON data but are stored as TEXT, requiring explicit casting for JSON operations:
+
+#### Scryfall Cards (stg_scryfall_cards):
+
+- **Array Fields**: `colors`, `color_identity`, `color_indicator`, `keywords`, `games`
+- **Price Fields**: `price_usd`, `price_usd_foil`, `price_usd_etched`, `price_eur`, `price_eur_foil`, `price_tix`
+- **Date Fields**: `released_date` (stored as TEXT, needs `::DATE` casting)
+- **Legality Fields**: All `legal_*` fields (extracted from JSON but stored as TEXT)
+
+#### Commander Spellbook Cards (stg_cs_cards):
+
+- **Array Fields**: `keywords_array` (properly parsed to TEXT[])
+- **JSONB Fields**: `features` (actual JSONB)
+- **Price Fields**: `price_tcgplayer`, `price_cardkingdom`, `price_cardmarket` (stored as TEXT, needs `::NUMERIC` casting)
+- **Legality Fields**: All `legal_*` fields (extracted from JSON but stored as TEXT)
+
+#### Commander Spellbook Variants (stg_cs_variants):
+
+- **JSONB Fields**: `combo_cards`, `combo_uses`, `combo_includes`, `combo_produces`, `combo_requires` (stored as TEXT, invalid JSONB syntax)
+- **Price Fields**: `price_tcgplayer`, `price_cardmarket`, `price_cardkingdom` (stored as TEXT, needs `::NUMERIC` casting)
+- **Legality Fields**: All `legal_*` fields (extracted from JSON but stored as TEXT)
+
+### Data Type Casting Requirements
+
+When working with these fields in intermediate/mart models:
+
+```sql
+-- Price calculations
+price_usd::NUMERIC * 1.1
+
+-- Date comparisons
+released_date::DATE >= CURRENT_DATE - INTERVAL '1 year'
+
+-- JSONB operations (use with caution)
+combo_cards::JSONB  -- May fail if invalid JSON syntax
+
+-- Array operations
+colors::TEXT[]  -- For JSON arrays stored as TEXT
+```
 
 ### Scryfall Specific Fields
 
