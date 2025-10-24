@@ -32,17 +32,34 @@ pull_from_db_job = dg.define_asset_job(
 
 create_staging_views_job = dg.define_asset_job(
     name="create_staging_views_job",
-    selection=dg.AssetSelection.groups("staging"),  # Adjust based on your group name
+    selection=[
+        "stg_scryfall_cards",
+        "stg_cs_cards",
+        "stg_cs_features",
+        "stg_cs_templates",
+        "stg_cs_variants",
+    ],
 )
 
 create_intermediate_models_job = dg.define_asset_job(
     name="create_intermediate_models_job",
-    selection=dg.AssetSelection.groups("intermediate"),
+    selection=[
+        "int_unified_cards",
+        "int_card_legalities",
+        "int_price_analysis",
+        "int_combo_enrichment",
+    ],
 )
 
 create_mart_models_job = dg.define_asset_job(
     name="create_mart_models_job",
-    selection=dg.AssetSelection.groups("marts"),
+    selection=[
+        "mart_card_catalog",
+        "mart_format_legalities",
+        "mart_card_combo_lookup",
+        "mart_combo_analysis",
+        "mart_price_trends",
+    ],
 )
 
 large_data_job = dg.define_asset_job(
@@ -53,18 +70,18 @@ large_data_job = dg.define_asset_job(
     ],
 )
 
-create_all_views_job = dg.define_asset_job(
-    name="create_all_views_job",
-    selection=[
-        "pull_scryfall_table",
-        "pull_cs_cards_table",
-        "pull_cs_variants_table",
-        "pull_cs_features_table",
-        "pull_cs_templates_table",
-        "stg_scryfall_cards",
-        "stg_cs_cards",
-        "stg_cs_variants",
-        "stg_cs_features",
-        "stg_cs_templates",
-    ],
-)
+# create_all_views_job = dg.define_asset_job(
+#     name="create_all_views_job",
+#     selection=[
+#         "pull_scryfall_table",
+#         "pull_cs_cards_table",
+#         "pull_cs_variants_table",
+#         "pull_cs_features_table",
+#         "pull_cs_templates_table",
+#         "stg_scryfall_cards",
+#         "stg_cs_cards",
+#         "stg_cs_variants",
+#         "stg_cs_features",
+#         "stg_cs_templates",
+#     ],
+# )

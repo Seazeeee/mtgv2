@@ -242,27 +242,8 @@ class CustomDagsterDbtTranslator(DagsterDbtTranslator):
 @dbt_assets(
     manifest=dbt_project.manifest_path,
     dagster_dbt_translator=CustomDagsterDbtTranslator(),
-    select="path:models/staging",
 )
-def dbt_staging_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["run"], context=context).stream()
-
-
-@dbt_assets(
-    manifest=dbt_project.manifest_path,
-    dagster_dbt_translator=CustomDagsterDbtTranslator(),
-    select="path:models/intermediate",
-)
-def dbt_intermediate_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
-    yield from dbt.cli(["run"], context=context).stream()
-
-
-@dbt_assets(
-    manifest=dbt_project.manifest_path,
-    dagster_dbt_translator=CustomDagsterDbtTranslator(),
-    select="path:models/marts",
-)
-def dbt_mart_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
+def dbt_models(context: dg.AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["run"], context=context).stream()
 
 
