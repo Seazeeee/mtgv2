@@ -62,7 +62,7 @@ WITH scryfall_cards AS (
 ),
 
 cs_cards AS (
-    SELECT 
+    SELECT DISTINCT ON (oracle_id)
         oracle_id,
         cs_card_id,
         card_name,
@@ -109,6 +109,7 @@ cs_cards AS (
         price_cardmarket,
         'commander_spellbook' AS data_source
     FROM {{ ref('stg_cs_cards') }}
+    ORDER BY oracle_id, cs_card_id
 ),
 
 -- Combine both sources, prioritizing Scryfall for core card data

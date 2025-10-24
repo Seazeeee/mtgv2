@@ -24,7 +24,7 @@ WITH scryfall_cards AS (
 ),
 
 cs_cards AS (
-    SELECT 
+    SELECT DISTINCT ON (oracle_id)
         oracle_id,
         card_name,
         type_line,
@@ -36,6 +36,7 @@ cs_cards AS (
         price_cardkingdom,
         price_cardmarket
     FROM {{ ref('stg_cs_cards') }}
+    ORDER BY oracle_id
 ),
 
 -- Combine pricing data from both sources
