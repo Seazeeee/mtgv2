@@ -34,7 +34,7 @@ WITH combo_data AS (
     FROM {{ ref('mart_combo_analysis') }}
 ),
 
--- Extract card names from combo_cards field using LATERAL join
+-- Extract card IDs from combo_cards field using LATERAL join
 -- This approach properly handles set-returning functions
 card_extractions AS (
     SELECT 
@@ -67,13 +67,13 @@ card_extractions AS (
         cd.legal_oathbreaker,
         cd.legal_paupercommander,
         
-        -- Extract individual card names using LATERAL join
-        TRIM(card_name) AS card_name,
+        -- Extract individual card IDs using LATERAL join
+        TRIM(card_id) AS card_id,
         
         -- Extract card positions (for ordering)
         ROW_NUMBER() OVER (
             PARTITION BY cd.variant_id 
-            ORDER BY card_name
+            ORDER BY card_id
         ) AS card_position
         
     FROM combo_data cd
@@ -81,15 +81,15 @@ card_extractions AS (
         SELECT unnest(string_to_array(
             REGEXP_REPLACE(cd.combo_cards, '[\[\]{}"]', '', 'g'), 
             ','
-        )) AS card_name
+        )) AS card_id
     ) AS card_split
     WHERE cd.combo_cards IS NOT NULL 
       AND cd.combo_cards != '' 
       AND cd.combo_cards != 'null'
 ),
 
--- Clean up card names and filter out empty ones
-cleaned_cards AS (
+-- Extract numeric IDs first
+extracted_card_ids AS (
     SELECT 
         variant_id,
         description,
@@ -119,12 +119,55 @@ cleaned_cards AS (
         legal_brawl,
         legal_oathbreaker,
         legal_paupercommander,
-        TRIM(card_name) AS card_name,
+        
+        -- Extract numeric ID from "id: 1234" format
+        REGEXP_REPLACE(REGEXP_REPLACE(card_id, '^id:\s*', '', 'i'), '[^0-9]', '', 'g') AS card_id,
+        
         card_position
     FROM card_extractions
-    WHERE TRIM(card_name) IS NOT NULL 
-      AND TRIM(card_name) != ''
-      AND LENGTH(TRIM(card_name)) > 2
+    WHERE card_id IS NOT NULL 
+      AND card_id != ''
+      AND LENGTH(card_id) > 2
+      AND REGEXP_REPLACE(REGEXP_REPLACE(card_id, '^id:\s*', '', 'i'), '[^0-9]', '', 'g') != ''  -- Ensure we have numeric content
+),
+
+-- Clean up card IDs and remove duplicates
+cleaned_cards AS (
+    SELECT DISTINCT ON (variant_id, card_id)
+        variant_id,
+        description,
+        notes,
+        complexity_level,
+        difficulty_level,
+        price_tier,
+        legal_formats_count,
+        estimated_card_count,
+        estimated_feature_count,
+        mana_value_needed,
+        popularity,
+        bracket_tag,
+        best_price,
+        combo_cards,
+        combo_uses,
+        combo_includes,
+        combo_produces,
+        combo_requires,
+        legal_commander,
+        legal_modern,
+        legal_legacy,
+        legal_vintage,
+        legal_pauper,
+        legal_pioneer,
+        legal_standard,
+        legal_brawl,
+        legal_oathbreaker,
+        legal_paupercommander,
+        
+        card_id,
+        card_position
+    FROM extracted_card_ids
+    WHERE card_id IS NOT NULL AND card_id != ''
+    ORDER BY variant_id, card_id, card_position
 ),
 
 -- Add card metadata from card catalog
@@ -158,7 +201,7 @@ card_combo_lookup AS (
         cc.legal_brawl,
         cc.legal_oathbreaker,
         cc.legal_paupercommander,
-        cc.card_name,
+        cc.card_id,
         cc.card_position,
         
         -- Card metadata from catalog
@@ -172,6 +215,7 @@ card_combo_lookup AS (
         cat.primary_type,
         cat.cmc_tier,
         cat.color_complexity,
+        cat.card_name,
         
         -- Calculated fields
         CASE 
@@ -186,23 +230,18 @@ card_combo_lookup AS (
             WHEN cc.estimated_card_count <= 4 THEN 'Moderate Combo'
             WHEN cc.estimated_card_count <= 6 THEN 'Complex Combo'
             ELSE 'Very Complex Combo'
-        END AS combo_type,
-        
-        -- Search optimization fields
-        LOWER(cc.card_name) AS card_name_lower,
-        LOWER(cc.description) AS description_lower,
-        LOWER(cc.notes) AS notes_lower
+        END AS combo_type
         
     FROM cleaned_cards cc
     LEFT JOIN {{ ref('mart_card_catalog') }} cat 
-        ON LOWER(TRIM(cc.card_name)) = LOWER(TRIM(cat.card_name))
+        ON cc.card_id::BIGINT = cat.cs_card_id
 )
 
 SELECT 
     -- Core identifiers
     variant_id,
+    card_id,
     card_name,
-    card_name_lower,
     card_position,
     card_role,
     
@@ -220,9 +259,7 @@ SELECT
     
     -- Combo information
     description,
-    description_lower,
     notes,
-    notes_lower,
     complexity_level,
     difficulty_level,
     combo_type,
@@ -268,7 +305,7 @@ SELECT
 
 FROM card_combo_lookup
 ORDER BY 
-    card_name_lower,
+    LOWER(card_name),
     search_priority,
     popularity DESC,
     estimated_card_count ASC
